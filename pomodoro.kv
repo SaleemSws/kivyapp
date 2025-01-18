@@ -1,0 +1,27 @@
+<Pomodoro>:
+    orientation: 'vertical'
+    padding: 20
+    spacing: 10
+
+    Label:
+        text: '{:02d}:{:02d}'.format(root.time // 60, root.time % 60)
+        font_size: 48
+        size_hint_y: None
+        height: self.texture_size[1]
+
+    BoxLayout:
+        size_hint_y: None
+        height: 50
+        spacing: 10
+
+        Button:
+            text: 'Start'
+            on_press: root.start_timer()
+
+        Button:
+            text: 'Stop'
+            on_press: root.stop_timer()
+
+        Button:
+            text: 'Reset'
+            on_press: root.reset_timer()
