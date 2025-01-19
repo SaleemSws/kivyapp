@@ -1,11 +1,13 @@
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, StringProperty
 from kivy.clock import Clock
 
 
 class Pomodoro(BoxLayout):
-    time = NumericProperty(25 * 60)  # ตั้งค่าเริ่มต้นเป็น 25 นาที (1500 วินาที)
+    time = NumericProperty(25 * 60)  # 25 minutes for work
+    break_time = NumericProperty(5 * 60)  # 5 minutes for break
+    mode = StringProperty("WORK")  # Current mode (WORK/BREAK)
     is_running = False
 
     def start_timer(self):
@@ -20,7 +22,19 @@ class Pomodoro(BoxLayout):
 
     def reset_timer(self):
         self.stop_timer()
-        self.time = 25 * 60
+        if self.mode == "WORK":
+            self.time = 25 * 60
+        else:
+            self.time = 5 * 60
+
+    def switch_mode(self):
+        self.stop_timer()
+        if self.mode == "WORK":
+            self.mode = "BREAK"
+            self.time = self.break_time
+        else:
+            self.mode = "WORK"
+            self.time = 25 * 60
 
     def update_time(self, dt):
         if self.time > 0:
