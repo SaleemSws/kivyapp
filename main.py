@@ -56,6 +56,16 @@ class Pomodoro(BoxLayout):
         except ValueError:
             pass
 
+    def set_break_duration(self, duration_text):
+        try:
+            duration = int(duration_text)
+            if 1 <= duration <= 30:  # Limit between 1 and 30 minutes
+                self.break_duration = duration
+                if self.mode == "BREAK":
+                    self.time = duration * 60
+        except ValueError:
+            pass
+
 
 class PomodoroApp(App):
     def build(self):

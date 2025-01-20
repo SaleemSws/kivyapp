@@ -38,7 +38,15 @@
             size_hint_x: 0.2
             on_text_validate: root.set_work_duration(self.text)
 
-        
+        Label:
+            text: 'Break Time (min):'
+            size_hint_x: 0.4
+
+        TextInput:
+            text: str(root.break_duration)
+            multiline: False
+            size_hint_x: 0.2
+            on_text_validate: root.set_break_duration(self.text)
 
     # Control buttons
     BoxLayout:
