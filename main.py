@@ -3,6 +3,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import NumericProperty, StringProperty
 from kivy.clock import Clock
 from kivy.uix.textinput import TextInput
+from kivy.core.audio import SoundLoader
+from kivy.resources import resource_add_path
+import os
 
 
 class Pomodoro(BoxLayout):
@@ -12,6 +15,20 @@ class Pomodoro(BoxLayout):
     work_duration = NumericProperty(25)  # Default work duration in minutes
     break_duration = NumericProperty(5)  # Default break duration in minutes
     is_running = False
+
+    def __init__(self, **kwargs):
+        super(Pomodoro, self).__init__(**kwargs)
+        # Load the sound file
+        self.load_sounds()
+
+    def load_sounds(self):
+        # Try to load the sound file
+        sound_file = "alert.mp3"  # You'll need to provide this sound file
+        try:
+            self.timer_sound = SoundLoader.load(sound_file)
+        except:
+            print("Could not load sound file")
+            self.timer_sound = None
 
     def start_timer(self):
         if not self.is_running:
@@ -44,7 +61,12 @@ class Pomodoro(BoxLayout):
             self.time -= 1
         else:
             self.stop_timer()
+            self.play_alert()
             print("Time's up!")
+
+    def play_alert(self):
+        if self.timer_sound:
+            self.timer_sound.play()
 
     def set_work_duration(self, duration_text):
         try:
