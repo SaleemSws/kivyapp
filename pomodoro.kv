@@ -1,7 +1,7 @@
 <Pomodoro>:
     orientation: 'vertical'
     padding: 70
-    spacing: 60
+    spacing: 40
 
     Label:
         text: 'POMODORO TIMER'
@@ -17,33 +17,49 @@
 
     Label:
         text: '{:02d}:{:02d}'.format(root.time // 60, root.time % 60)
-        font_size: 72  # Increased font size
+        font_size: 72
         size_hint_y: None
         height: self.texture_size[1]
         color: (0.2, 0.8, 0.2, 1) if root.mode == 'WORK' else (0.2, 0.2, 0.8, 1)
 
+    # Custom timer settings
     BoxLayout:
         size_hint_y: None
-        height: 60  # Increased button height
+        height: 40
+        spacing: 10
+
+        Label:
+            text: 'Work Time (min):'
+            size_hint_x: 0.4
+
+        TextInput:
+            text: str(root.work_duration)
+            multiline: False
+            size_hint_x: 0.2
+            on_text_validate: root.set_work_duration(self.text)
+
+        
+
+    # Control buttons
+    BoxLayout:
+        size_hint_y: None
+        height: 60
         spacing: 15
 
         Button:
             text: 'Start'
             font_size: 24
             on_press: root.start_timer()
-            
 
         Button:
             text: 'Stop'
             font_size: 24
             on_press: root.stop_timer()
-            
 
         Button:
             text: 'Reset'
             font_size: 24
             on_press: root.reset_timer()
-            
 
     Button:
         text: 'Switch to ' + ('Break' if root.mode == 'WORK' else 'Work')

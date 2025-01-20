@@ -2,12 +2,15 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import NumericProperty, StringProperty
 from kivy.clock import Clock
+from kivy.uix.textinput import TextInput
 
 
 class Pomodoro(BoxLayout):
     time = NumericProperty(25 * 60)  # 25 minutes for work
     break_time = NumericProperty(5 * 60)  # 5 minutes for break
     mode = StringProperty("WORK")  # Current mode (WORK/BREAK)
+    work_duration = NumericProperty(25)  # Default work duration in minutes
+    break_duration = NumericProperty(5)  # Default break duration in minutes
     is_running = False
 
     def start_timer(self):
@@ -23,18 +26,18 @@ class Pomodoro(BoxLayout):
     def reset_timer(self):
         self.stop_timer()
         if self.mode == "WORK":
-            self.time = 25 * 60
+            self.time = self.work_duration * 60
         else:
-            self.time = 5 * 60
+            self.time = self.break_duration * 60
 
     def switch_mode(self):
         self.stop_timer()
         if self.mode == "WORK":
             self.mode = "BREAK"
-            self.time = self.break_time
+            self.time = self.break_duration * 60
         else:
             self.mode = "WORK"
-            self.time = 25 * 60
+            self.time = self.work_duration * 60
 
     def update_time(self, dt):
         if self.time > 0:
@@ -42,6 +45,16 @@ class Pomodoro(BoxLayout):
         else:
             self.stop_timer()
             print("Time's up!")
+
+    def set_work_duration(self, duration_text):
+        try:
+            duration = int(duration_text)
+            if 1 <= duration <= 120:  # Limit between 1 and 120 minutes
+                self.work_duration = duration
+                if self.mode == "WORK":
+                    self.time = duration * 60
+        except ValueError:
+            pass
 
 
 class PomodoroApp(App):
