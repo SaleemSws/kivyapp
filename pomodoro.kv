@@ -1,7 +1,7 @@
 <Pomodoro>:
     orientation: 'vertical'
     padding: 70
-    spacing: 40
+    spacing: 30
 
     Label:
         text: 'POMODORO TIMER'
@@ -16,13 +16,34 @@
         height: self.texture_size[1]
 
     Label:
-        text: '{:02d}:{:02d}'.format(root.time // 60, root.time % 60)
+        text: str(root.time // 60) + ':' + str(root.time % 60).zfill(2)
         font_size: 72
         size_hint_y: None
         height: self.texture_size[1]
         color: (0.2, 0.8, 0.2, 1) if root.mode == 'WORK' else (0.2, 0.2, 0.8, 1)
 
-    # Custom timer settings
+    # Daily Goal Progress
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_y: None
+        height: 100
+        spacing: 10
+
+        Label:
+            text: 'Daily Goal Progress'
+            font_size: 20
+
+        Label:
+            text: str(root.minutes_completed // 60) + ' hours ' + str(root.minutes_completed % 60) + ' minutes / ' + str(root.daily_goal_hours) + ' hours goal'
+            font_size: 18
+
+        ProgressBar:
+            max: root.daily_goal_hours * 60
+            value: root.minutes_completed
+            size_hint_y: None
+            height: 20
+
+    # Timer Settings
     BoxLayout:
         size_hint_y: None
         height: 40
@@ -30,7 +51,7 @@
 
         Label:
             text: 'Work Time (min):'
-            size_hint_x: 0.4
+            size_hint_x: 0.3
 
         TextInput:
             text: str(root.work_duration)
@@ -40,13 +61,34 @@
 
         Label:
             text: 'Break Time (min):'
-            size_hint_x: 0.4
+            size_hint_x: 0.3
 
         TextInput:
             text: str(root.break_duration)
             multiline: False
             size_hint_x: 0.2
             on_text_validate: root.set_break_duration(self.text)
+
+    # Daily Goal Setting
+    BoxLayout:
+        size_hint_y: None
+        height: 40
+        spacing: 10
+
+        Label:
+            text: 'Daily Goal (hours):'
+            size_hint_x: 0.3
+
+        TextInput:
+            text: str(root.daily_goal_hours)
+            multiline: False
+            size_hint_x: 0.2
+            on_text_validate: root.set_daily_goal(self.text)
+
+        Button:
+            text: 'Reset Progress'
+            size_hint_x: 0.5
+            on_press: root.reset_daily_progress()
 
     # Control buttons
     BoxLayout:
