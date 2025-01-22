@@ -1,7 +1,19 @@
+<PomodoroRoot>:
+    # No need for specific properties here as the video and Pomodoro widgets
+    # are added in Python code
+
 <Pomodoro>:
     orientation: 'vertical'
     padding: 70
     spacing: 30
+    
+    # Add semi-transparent background for better readability
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0.5  # Semi-transparent black background
+        Rectangle:
+            pos: self.pos
+            size: self.size
     
     Label:
         text: 'POMODORO TIMER'
