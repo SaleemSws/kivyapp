@@ -40,6 +40,9 @@ class PomodoroRoot(FloatLayout):
         self.pomodoro = Pomodoro()
         self.add_widget(self.pomodoro)
 
+    def decrease_volume(self):
+        self.video_widget.volume = max(0.0, self.video_widget.volume - 0.1)
+
     def toggle_mute(self):
         if self.video_widget.volume > 0:
             self._previous_volume = self.video_widget.volume
