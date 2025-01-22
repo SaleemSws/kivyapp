@@ -1,12 +1,43 @@
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import NumericProperty, StringProperty, ListProperty
+from kivy.properties import (
+    NumericProperty,
+    StringProperty,
+    ListProperty,
+    ObjectProperty,
+)
 from kivy.clock import Clock
 from kivy.uix.textinput import TextInput
 from kivy.core.audio import SoundLoader
 from kivy.animation import Animation
 from kivy.resources import resource_add_path
+from kivy.uix.video import Video
+from kivy.uix.floatlayout import FloatLayout
 import os
+
+
+class VideoBackground(Video):
+    def __init__(self, **kwargs):
+        super(VideoBackground, self).__init__(**kwargs)
+        self.state = "play"
+        self.options = {"eos": "loop"}
+        self.allow_stretch = True
+        self.keep_ratio = False
+        self.volume = 0
+
+
+class PomodoroRoot(FloatLayout):
+    video_widget = ObjectProperty(None)
+
+    def __init__(self, **kwargs):
+        super(PomodoroRoot, self).__init__(**kwargs)
+        self.video_widget = VideoBackground(
+            source="background.mp4"
+        )  # Replace with your video file
+        self.add_widget(self.video_widget)
+        # Add the main Pomodoro interface on top
+        self.pomodoro = Pomodoro()
+        self.add_widget(self.pomodoro)
 
 
 class CustomProgressBar(BoxLayout):
@@ -157,7 +188,7 @@ class Pomodoro(BoxLayout):
 
 class PomodoroApp(App):
     def build(self):
-        return Pomodoro()
+        return PomodoroRoot()
 
 
 if __name__ == "__main__":
