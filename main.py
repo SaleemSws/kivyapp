@@ -1,3 +1,4 @@
+# main.py
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import (
@@ -5,6 +6,7 @@ from kivy.properties import (
     StringProperty,
     ListProperty,
     ObjectProperty,
+    BoundedNumericProperty,
 )
 from kivy.clock import Clock
 from kivy.uix.textinput import TextInput
@@ -17,6 +19,8 @@ import os
 
 
 class VideoBackground(Video):
+    volume = BoundedNumericProperty(0, min=0, max=1)
+
     def __init__(self, **kwargs):
         super(VideoBackground, self).__init__(**kwargs)
         self.state = "play"
@@ -31,13 +35,17 @@ class PomodoroRoot(FloatLayout):
 
     def __init__(self, **kwargs):
         super(PomodoroRoot, self).__init__(**kwargs)
-        self.video_widget = VideoBackground(
-            source="background.mp4"
-        )  # Replace with your video file
+        self.video_widget = VideoBackground(source="background.mp4")
         self.add_widget(self.video_widget)
-        # Add the main Pomodoro interface on top
         self.pomodoro = Pomodoro()
         self.add_widget(self.pomodoro)
+
+    def toggle_mute(self):
+        if self.video_widget.volume > 0:
+            self._previous_volume = self.video_widget.volume
+            self.video_widget.volume = 0
+        else:
+            self.video_widget.volume = getattr(self, "_previous_volume", 0.5)
 
 
 class CustomProgressBar(BoxLayout):
@@ -115,10 +123,8 @@ class Pomodoro(BoxLayout):
             self.time = self.work_duration * 60
 
     def update_progress_bar(self):
-        # Calculate progress percentage with maximum cap at 100%
         progress = min(self.minutes_completed / (self.daily_goal_hours * 60), 1.0) * 100
 
-        # Update progress color based on completion
         if progress < 30:
             self.progress_color = [0.3, 0.6 + (progress / 30 * 0.3), 1, 1]
         elif progress < 70:
@@ -129,7 +135,6 @@ class Pomodoro(BoxLayout):
             self.progress_color = [0.1, 0.9 + (ratio * 0.1), 0.5 - (ratio * 0.3), 1]
 
     def animate_progress_update(self, completed_minutes):
-        # Cap the progress at the daily goal
         target_minutes = min(
             self.minutes_completed + completed_minutes, self.daily_goal_hours * 60
         )

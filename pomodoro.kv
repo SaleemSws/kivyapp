@@ -1,19 +1,46 @@
 <PomodoroRoot>:
-    # No need for specific properties here as the video and Pomodoro widgets
-    # are added in Python code
 
 <Pomodoro>:
     orientation: 'vertical'
     padding: 70
     spacing: 30
     
-    # Add semi-transparent background for better readability
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 0.5  # Semi-transparent black background
+            rgba: 0, 0, 0, 0.5
         Rectangle:
             pos: self.pos
             size: self.size
+    
+    # Add volume controls at the top
+    BoxLayout:
+        size_hint_y: None
+        height: 40
+        spacing: 10
+        padding: [10, 0]
+        
+        Widget:
+            size_hint_x: 0.7
+        
+        BoxLayout:
+            size_hint_x: 0.3
+            spacing: 5
+            
+            
+            
+            Button:
+                size_hint_x: None
+                width: 40
+                background_normal: ''
+                background_color: 0, 0, 0, 0
+                on_press: app.root.toggle_mute()
+                Image:
+                    source: 'volume-x.png'
+                    center_x: self.parent.center_x
+                    center_y: self.parent.center_y
+                    size: 30, 30
+            
+
     
     Label:
         text: 'POMODORO TIMER'
@@ -34,7 +61,6 @@
         height: self.texture_size[1]
         color: (0.2, 0.8, 0.2, 1) if root.mode == 'WORK' else (0.2, 0.2, 0.8, 1)
     
-    # Daily Goal Progress with enhanced visibility
     BoxLayout:
         orientation: 'vertical'
         size_hint_y: None
@@ -58,25 +84,21 @@
             halign: 'left'
             text_size: self.size
         
-        # Custom Progress Bar
         BoxLayout:
             size_hint_y: None
             height: 40
             canvas:
-                # Background
                 Color:
                     rgba: 0.9, 0.9, 0.9, 1
                 Rectangle:
                     pos: self.pos
                     size: self.size
-                # Progress
                 Color:
                     rgba: root.progress_color
                 Rectangle:
                     pos: self.pos
                     size: min(self.width * (root.minutes_completed / (root.daily_goal_hours * 60)) if root.daily_goal_hours > 0 else 0, self.width), self.height
     
-    # Timer Settings
     BoxLayout:
         size_hint_y: None
         height: 40
@@ -102,7 +124,6 @@
             size_hint_x: 0.2
             on_text_validate: root.set_break_duration(self.text)
     
-    # Daily Goal Setting
     BoxLayout:
         size_hint_y: None
         height: 40
@@ -123,7 +144,6 @@
             size_hint_x: 0.5
             on_press: root.reset_daily_progress()
     
-    # Control buttons
     BoxLayout:
         size_hint_y: None
         height: 60
