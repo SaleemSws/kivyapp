@@ -12,22 +12,23 @@ import os
 class CustomProgressBar(BoxLayout):
     value = NumericProperty(0)
     max = NumericProperty(100)
-    progress_color = ListProperty([0.3, 0.6, 1, 1])  # เริ่มต้นด้วยสีฟ้า
+    progress_color = ListProperty([0.3, 0.6, 1, 1])  # Start with blue
 
     def on_value(self, instance, value):
-        # คำนวณสีตามความคืบหน้า
-        progress_ratio = value / self.max if self.max > 0 else 0
-        if progress_ratio < 0.5:
-            # ไล่จากสีฟ้าไปสีเขียวอ่อน
-            self.progress_color = [
-                0.3,
-                0.6 + (progress_ratio * 0.8),
-                1 - (progress_ratio * 0.5),
-                1,
-            ]
+        # Ensure progress doesn't exceed 100%
+        progress_ratio = min(value / self.max, 1.0) if self.max > 0 else 0
+
+        if progress_ratio < 0.3:
+            # Blue to light blue (0-30%)
+            self.progress_color = [0.3, 0.6 + (progress_ratio * 1.0), 1, 1]
+        elif progress_ratio < 0.7:
+            # Light blue to light green (30-70%)
+            ratio = (progress_ratio - 0.3) / 0.4
+            self.progress_color = [0.3 - (ratio * 0.2), 0.9, 1 - (ratio * 0.5), 1]
         else:
-            # ไล่จากสีเขียวอ่อนไปสีเขียวเข้ม
-            self.progress_color = [0.3, 1, 0.5 - ((progress_ratio - 0.5) * 0.5), 1]
+            # Light green to vibrant green (70-100%)
+            ratio = (progress_ratio - 0.7) / 0.3
+            self.progress_color = [0.1, 0.9 + (ratio * 0.1), 0.5 - (ratio * 0.3), 1]
 
 
 class Pomodoro(BoxLayout):
@@ -73,7 +74,6 @@ class Pomodoro(BoxLayout):
     def switch_mode(self):
         self.stop_timer()
         if self.mode == "WORK":
-            # เพิ่มเวลาที่ทำเสร็จและแสดงเอฟเฟกต์
             completed_time = self.work_duration - (self.time // 60)
             if completed_time > 0:
                 self.animate_progress_update(completed_time)
@@ -83,13 +83,30 @@ class Pomodoro(BoxLayout):
             self.mode = "WORK"
             self.time = self.work_duration * 60
 
+    def update_progress_bar(self):
+        # Calculate progress percentage with maximum cap at 100%
+        progress = min(self.minutes_completed / (self.daily_goal_hours * 60), 1.0) * 100
+
+        # Update progress color based on completion
+        if progress < 30:
+            self.progress_color = [0.3, 0.6 + (progress / 30 * 0.3), 1, 1]
+        elif progress < 70:
+            ratio = (progress - 30) / 40
+            self.progress_color = [0.3 - (ratio * 0.2), 0.9, 1 - (ratio * 0.5), 1]
+        else:
+            ratio = (progress - 70) / 30
+            self.progress_color = [0.1, 0.9 + (ratio * 0.1), 0.5 - (ratio * 0.3), 1]
+
     def animate_progress_update(self, completed_minutes):
-        # สร้างแอนิเมชันสำหรับการอัพเดตความคืบหน้า
-        target_minutes = self.minutes_completed + completed_minutes
+        # Cap the progress at the daily goal
+        target_minutes = min(
+            self.minutes_completed + completed_minutes, self.daily_goal_hours * 60
+        )
         anim = Animation(
             minutes_completed=target_minutes, duration=0.5, transition="out_bounce"
         )
         anim.start(self)
+        Clock.schedule_once(lambda dt: self.update_progress_bar(), 0.5)
 
     def update_time(self, dt):
         if self.time > 0:

@@ -2,42 +2,42 @@
     orientation: 'vertical'
     padding: 70
     spacing: 30
-
+    
     Label:
         text: 'POMODORO TIMER'
         font_size: 36
         size_hint_y: None
         height: self.texture_size[1]
-
+    
     Label:
         text: 'Current Mode: ' + root.mode
         font_size: 24
         size_hint_y: None
         height: self.texture_size[1]
-
+    
     Label:
         text: str(root.time // 60) + ':' + str(root.time % 60).zfill(2)
         font_size: 72
         size_hint_y: None
         height: self.texture_size[1]
         color: (0.2, 0.8, 0.2, 1) if root.mode == 'WORK' else (0.2, 0.2, 0.8, 1)
-
+    
     # Daily Goal Progress with enhanced visibility
     BoxLayout:
         orientation: 'vertical'
         size_hint_y: None
-        height: 150  # เพิ่มความสูงของส่วน progress
+        height: 150
         spacing: 15
-        padding: [30, 0, 30, 0]  # เพิ่ม padding ซ้าย-ขวา
-
+        padding: [30, 0, 30, 0]
+        
         Label:
             text: 'Daily Goal Progress'
-            font_size: 24  # เพิ่มขนาดตัวอักษร
+            font_size: 24
             size_hint_y: None
             height: 30
             halign: 'left'
             text_size: self.size
-
+        
         Label:
             text: str(root.minutes_completed // 60) + ' hours ' + str(root.minutes_completed % 60) + ' minutes / ' + str(root.daily_goal_hours) + ' hours goal'
             font_size: 20
@@ -45,93 +45,93 @@
             height: 30
             halign: 'left'
             text_size: self.size
-
+        
         # Custom Progress Bar
         BoxLayout:
             size_hint_y: None
-            height: 40  # เพิ่มความสูงของ progress bar
+            height: 40
             canvas:
-                # พื้นหลัง progress bar
+                # Background
                 Color:
                     rgba: 0.9, 0.9, 0.9, 1
                 Rectangle:
                     pos: self.pos
                     size: self.size
-                # ส่วนที่แสดงความคืบหน้า
+                # Progress
                 Color:
                     rgba: root.progress_color
                 Rectangle:
                     pos: self.pos
-                    size: self.width * (root.minutes_completed / (root.daily_goal_hours * 60)) if root.daily_goal_hours > 0 else 0, self.height
-
+                    size: min(self.width * (root.minutes_completed / (root.daily_goal_hours * 60)) if root.daily_goal_hours > 0 else 0, self.width), self.height
+    
     # Timer Settings
     BoxLayout:
         size_hint_y: None
         height: 40
         spacing: 10
-
+        
         Label:
             text: 'Work Time (min):'
             size_hint_x: 0.3
-
+        
         TextInput:
             text: str(root.work_duration)
             multiline: False
             size_hint_x: 0.2
             on_text_validate: root.set_work_duration(self.text)
-
+        
         Label:
             text: 'Break Time (min):'
             size_hint_x: 0.3
-
+        
         TextInput:
             text: str(root.break_duration)
             multiline: False
             size_hint_x: 0.2
             on_text_validate: root.set_break_duration(self.text)
-
+    
     # Daily Goal Setting
     BoxLayout:
         size_hint_y: None
         height: 40
         spacing: 10
-
+        
         Label:
             text: 'Daily Goal (hours):'
             size_hint_x: 0.3
-
+        
         TextInput:
             text: str(root.daily_goal_hours)
             multiline: False
             size_hint_x: 0.2
             on_text_validate: root.set_daily_goal(self.text)
-
+        
         Button:
             text: 'Reset Progress'
             size_hint_x: 0.5
             on_press: root.reset_daily_progress()
-
+    
     # Control buttons
     BoxLayout:
         size_hint_y: None
         height: 60
         spacing: 15
-
+        
         Button:
             text: 'Start'
             font_size: 24
             on_press: root.start_timer()
-
+        
         Button:
             text: 'Stop'
             font_size: 24
             on_press: root.stop_timer()
-
+        
         Button:
             text: 'Reset'
             font_size: 24
             on_press: root.reset_timer()
-
+    
     Button:
         text: 'Switch to ' + ('Break' if root.mode == 'WORK' else 'Work')
         size_hint_y: None
