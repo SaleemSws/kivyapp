@@ -124,6 +124,15 @@ class PomodoroHistory:
             today_record["break_time"] += duration
             self.history["total_break_time"] += duration
 
+    def prune_old_records(self):
+        """Remove records older than 30 days."""
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+        self.history["daily_records"] = [
+            record
+            for record in self.history["daily_records"]
+            if datetime.strptime(record["date"], "%Y-%m-%d") >= thirty_days_ago
+        ]
+
 
 class VideoBackground(Video):
     volume = BoundedNumericProperty(0, min=0, max=1)
