@@ -66,6 +66,64 @@ class PomodoroHistory:
                 },
             }
 
+    def update_current_progress(self, minutes_completed):
+        """Update current progress"""
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        # Check if it's the same day
+        if self.history["current_progress"]["date"] != today:
+            # Reset if it's a new day
+            self.history["current_progress"] = {
+                "date": today,
+                "minutes_completed": 0,
+                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            }
+
+        # Update minutes completed
+        self.history["current_progress"]["minutes_completed"] = minutes_completed
+        self.history["current_progress"]["last_updated"] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+        self.save_history()
+
+    def get_current_progress(self):
+        """Get current progress"""
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        # Check if it's the same day
+        if self.history["current_progress"]["date"] != today:
+            # Reset if it's a new day
+            return 0
+
+        return self.history["current_progress"]["minutes_completed"]
+
+    def record_session(self, mode, duration):
+        """Record a completed Pomodoro session."""
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        # Find today's record or create a new one
+        today_record = next(
+            (
+                record
+                for record in self.history["daily_records"]
+                if record["date"] == today
+            ),
+            None,
+        )
+
+        if not today_record:
+            today_record = {"date": today, "work_time": 0, "break_time": 0}
+            self.history["daily_records"].append(today_record)
+
+        # Update the record based on mode
+        if mode == "WORK":
+            today_record["work_time"] += duration
+            self.history["total_work_time"] += duration
+        else:
+            today_record["break_time"] += duration
+            self.history["total_break_time"] += duration
+
 
 class VideoBackground(Video):
     volume = BoundedNumericProperty(0, min=0, max=1)
