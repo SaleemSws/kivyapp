@@ -124,6 +124,11 @@ class PomodoroHistory:
             today_record["break_time"] += duration
             self.history["total_break_time"] += duration
 
+        # Remove old records (keep last 30 days)
+        self.prune_old_records()
+
+        self.save_history()
+
     def prune_old_records(self):
         """Remove records older than 30 days."""
         thirty_days_ago = datetime.now() - timedelta(days=30)
@@ -132,6 +137,47 @@ class PomodoroHistory:
             for record in self.history["daily_records"]
             if datetime.strptime(record["date"], "%Y-%m-%d") >= thirty_days_ago
         ]
+
+    def get_daily_summary(self, days=7):
+        """Get summary of work time for the last specified number of days."""
+        today = datetime.now()
+        summary = []
+
+        for i in range(days):
+            check_date = (today - timedelta(days=i)).strftime("%Y-%m-%d")
+            day_record = next(
+                (
+                    record
+                    for record in self.history["daily_records"]
+                    if record["date"] == check_date
+                ),
+                None,
+            )
+
+            summary.append(
+                {
+                    "date": check_date,
+                    "work_time": day_record["work_time"] if day_record else 0,
+                    "break_time": day_record["break_time"] if day_record else 0,
+                }
+            )
+
+        return summary
+
+    def save_history(self):
+        """Save history to JSON file."""
+        try:
+            with open(self.filename, "w") as f:
+                json.dump(self.history, f, indent=4)
+        except IOError:
+            print("Could not save history file")
+
+    def get_total_time_stats(self):
+        """Get total work and break time across all records."""
+        return {
+            "total_work_time": self.history["total_work_time"],
+            "total_break_time": self.history["total_break_time"],
+        }
 
 
 class VideoBackground(Video):
