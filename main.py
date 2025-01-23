@@ -16,6 +16,55 @@ from kivy.resources import resource_add_path
 from kivy.uix.video import Video
 from kivy.uix.floatlayout import FloatLayout
 import os
+import json
+from datetime import datetime, timedelta
+
+
+class PomodoroHistory:
+    def __init__(self, filename="pomodoro_history.json"):
+        self.filename = filename
+        self.history = self.load_history()
+
+    def load_history(self):
+        """Load history from JSON file or create a new one if it doesn't exist."""
+        try:
+            if os.path.exists(self.filename):
+                with open(self.filename, "r") as f:
+                    history = json.load(f)
+
+                    # Add default values if not present
+                    if "current_progress" not in history:
+                        history["current_progress"] = {
+                            "date": datetime.now().strftime("%Y-%m-%d"),
+                            "minutes_completed": 0,
+                            "last_updated": datetime.now().strftime(
+                                "%Y-%m-%d %H:%M:%S"
+                            ),
+                        }
+
+                    return history
+            else:
+                return {
+                    "daily_records": [],
+                    "total_work_time": 0,
+                    "total_break_time": 0,
+                    "current_progress": {
+                        "date": datetime.now().strftime("%Y-%m-%d"),
+                        "minutes_completed": 0,
+                        "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    },
+                }
+        except (json.JSONDecodeError, IOError):
+            return {
+                "daily_records": [],
+                "total_work_time": 0,
+                "total_break_time": 0,
+                "current_progress": {
+                    "date": datetime.now().strftime("%Y-%m-%d"),
+                    "minutes_completed": 0,
+                    "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                },
+            }
 
 
 class VideoBackground(Video):
@@ -54,28 +103,6 @@ class PomodoroRoot(FloatLayout):
             self.video_widget.volume = getattr(self, "_previous_volume", 0.5)
 
 
-class CustomProgressBar(BoxLayout):
-    value = NumericProperty(0)
-    max = NumericProperty(100)
-    progress_color = ListProperty([0.3, 0.6, 1, 1])  # Start with blue
-
-    def on_value(self, instance, value):
-        # Ensure progress doesn't exceed 100%
-        progress_ratio = min(value / self.max, 1.0) if self.max > 0 else 0
-
-        if progress_ratio < 0.3:
-            # Blue to light blue (0-30%)
-            self.progress_color = [0.3, 0.6 + (progress_ratio * 1.0), 1, 1]
-        elif progress_ratio < 0.7:
-            # Light blue to light green (30-70%)
-            ratio = (progress_ratio - 0.3) / 0.4
-            self.progress_color = [0.3 - (ratio * 0.2), 0.9, 1 - (ratio * 0.5), 1]
-        else:
-            # Light green to vibrant green (70-100%)
-            ratio = (progress_ratio - 0.7) / 0.3
-            self.progress_color = [0.1, 0.9 + (ratio * 0.1), 0.5 - (ratio * 0.3), 1]
-
-
 class Pomodoro(BoxLayout):
     time = NumericProperty(25 * 60)
     break_time = NumericProperty(5 * 60)
@@ -91,6 +118,17 @@ class Pomodoro(BoxLayout):
         super(Pomodoro, self).__init__(**kwargs)
         self.load_sounds()
 
+        # Initialize history tracking
+        self.history_tracker = PomodoroHistory()
+
+        # Start with current progress from history
+        self.minutes_completed = self.history_tracker.get_current_progress()
+        self.update_progress_bar()
+
+        # New properties to track session details
+        self.current_session_duration = 0
+        self.last_update_time = 0
+
     def load_sounds(self):
         sound_file = "alert.mp3"
         try:
@@ -102,6 +140,8 @@ class Pomodoro(BoxLayout):
     def start_timer(self):
         if not self.is_running:
             self.is_running = True
+            self.last_update_time = 0  # Reset tracking for this session
+            self.current_session_duration = 0
             Clock.schedule_interval(self.update_time, 1)
 
     def stop_timer(self):
@@ -117,6 +157,15 @@ class Pomodoro(BoxLayout):
             self.time = self.break_duration * 60
 
     def switch_mode(self):
+        # Record the current session before switching
+        if self.current_session_duration > 0:
+            session_duration = self.current_session_duration // 60
+            if self.mode == "WORK":
+                self.history_tracker.record_session("WORK", session_duration)
+            else:
+                self.history_tracker.record_session("BREAK", session_duration)
+
+        # Existing switch mode logic
         self.stop_timer()
         if self.mode == "WORK":
             completed_time = self.work_duration - (self.time // 60)
@@ -127,6 +176,9 @@ class Pomodoro(BoxLayout):
         else:
             self.mode = "WORK"
             self.time = self.work_duration * 60
+
+        # Reset session tracking
+        self.current_session_duration = 0
 
     def update_progress_bar(self):
         progress = min(self.minutes_completed / (self.daily_goal_hours * 60), 1.0) * 100
@@ -141,9 +193,15 @@ class Pomodoro(BoxLayout):
             self.progress_color = [0.1, 0.9 + (ratio * 0.1), 0.5 - (ratio * 0.3), 1]
 
     def animate_progress_update(self, completed_minutes):
+        # Add new progress
         target_minutes = min(
             self.minutes_completed + completed_minutes, self.daily_goal_hours * 60
         )
+
+        # Save current progress
+        self.history_tracker.update_current_progress(target_minutes)
+
+        # Original animation
         anim = Animation(
             minutes_completed=target_minutes, duration=0.5, transition="out_bounce"
         )
@@ -153,11 +211,18 @@ class Pomodoro(BoxLayout):
     def update_time(self, dt):
         if self.time > 0:
             self.time -= 1
+            self.current_session_duration += 1
         else:
             self.stop_timer()
             self.play_alert()
+
+            # Record the completed session
             if self.mode == "WORK":
                 self.animate_progress_update(self.work_duration)
+                self.history_tracker.record_session("WORK", self.work_duration)
+            else:
+                self.history_tracker.record_session("BREAK", self.break_duration)
+
             print("Time's up!")
 
     def play_alert(self):
@@ -195,6 +260,8 @@ class Pomodoro(BoxLayout):
     def reset_daily_progress(self):
         anim = Animation(minutes_completed=0, duration=0.5, transition="in_out_cubic")
         anim.start(self)
+        # Also reset the stored progress in history
+        self.history_tracker.update_current_progress(0)
 
 
 class PomodoroApp(App):
