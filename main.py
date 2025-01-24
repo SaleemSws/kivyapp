@@ -1,4 +1,3 @@
-# main.py
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import (
@@ -18,6 +17,9 @@ from kivy.uix.floatlayout import FloatLayout
 import os
 import json
 from datetime import datetime, timedelta
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.uix.button import Button
 
 
 class PomodoroHistory:
@@ -216,6 +218,22 @@ class PomodoroRoot(FloatLayout):
             self.video_widget.volume = getattr(self, "_previous_volume", 0.5)
 
 
+class TimesUpPopup(Popup):
+    def __init__(self, mode, **kwargs):
+        super().__init__(**kwargs)
+        self.title = ""  # Remove default title
+
+        # Set mode-specific text in the label
+        mode_label = self.ids.mode_label
+        mode_label.text = f"{mode.capitalize()} Session Completed!"
+
+        # Optional: Set different colors based on mode
+        if mode == "WORK":
+            mode_label.color = (0.2, 0.8, 0.2, 1)
+        else:
+            mode_label.color = (0.2, 0.2, 0.8, 1)
+
+
 class Pomodoro(BoxLayout):
     time = NumericProperty(25 * 60)
     break_time = NumericProperty(5 * 60)
@@ -328,6 +346,10 @@ class Pomodoro(BoxLayout):
         else:
             self.stop_timer()
             self.play_alert()
+
+            # Create and open the popup
+            popup = TimesUpPopup(mode=self.mode)
+            popup.open()
 
             # Record the completed session
             if self.mode == "WORK":
