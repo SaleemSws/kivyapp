@@ -376,6 +376,22 @@ class Pomodoro(BoxLayout):
         # Also reset the stored progress in history
         self.history_tracker.update_current_progress(0)
 
+    def get_history_summary(self):
+        """
+        Get a summary of recent history for displaying in the app.
+
+        Returns:
+        dict: A dictionary with recent history details
+        """
+        daily_summary = self.history_tracker.get_daily_summary()
+        total_stats = self.history_tracker.get_total_time_stats()
+
+        return {
+            "daily_summary": daily_summary,
+            "total_work_time": total_stats["total_work_time"],
+            "total_break_time": total_stats["total_break_time"],
+        }
+
 
 class PomodoroApp(App):
     def build(self):
