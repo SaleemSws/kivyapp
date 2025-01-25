@@ -20,6 +20,44 @@ from datetime import datetime, timedelta
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+import random
+from kivy.uix.image import Image
+
+
+WORK_MOTIVATIONS = [
+    "Great job staying focused!",
+    "You're making progress!",
+    "One step closer to your goals!",
+    "Consistency is key!",
+    "Productivity champion!",
+    "Keep crushing your tasks!",
+    "Your hard work pays off!",
+]
+
+BREAK_MOTIVATIONS = [
+    "Well-deserved break!",
+    "Rest and recharge!",
+    "Self-care is important!",
+    "Mental health matters!",
+    "Relaxation boosts productivity!",
+    "Take a moment to breathe!",
+    "You've earned this break!",
+]
+
+ICONS = {
+    "WORK": ["trophy.png", "rocket.png", "target.png", "success.png"],
+    "BREAK": ["relax.png", "meditation.png", "coffee.png", "refresh.png"],
+}
+
+
+def get_random_motivation(mode):
+    if mode == "WORK":
+        return random.choice(WORK_MOTIVATIONS)
+    return random.choice(BREAK_MOTIVATIONS)
+
+
+def get_random_icon(mode):
+    return random.choice(ICONS[mode])
 
 
 class PomodoroHistory:
@@ -221,17 +259,19 @@ class PomodoroRoot(FloatLayout):
 class TimesUpPopup(Popup):
     def __init__(self, mode, **kwargs):
         super().__init__(**kwargs)
-        self.title = ""  # Remove default title
+        self.size_hint = (0.8, 0.5)
+        self.auto_dismiss = False
 
-        # Set mode-specific text in the label
-        mode_label = self.ids.mode_label
-        mode_label.text = f"{mode.capitalize()} Session Completed!"
+        # Get random motivation and icon
+        motivation = get_random_motivation(mode)
+        icon = get_random_icon(mode)
 
-        # Optional: Set different colors based on mode
-        if mode == "WORK":
-            mode_label.color = (0.2, 0.8, 0.2, 1)
-        else:
-            mode_label.color = (0.2, 0.2, 0.8, 1)
+        # Set properties to be used in the KV file
+        self.ids.motivation_label.text = motivation
+        self.ids.icon_image.source = icon
+        self.ids.motivation_label.color = (
+            (0.2, 0.8, 0.2, 1) if mode == "WORK" else (0.2, 0.2, 0.8, 1)
+        )
 
 
 class Pomodoro(BoxLayout):
