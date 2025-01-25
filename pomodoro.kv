@@ -163,7 +163,8 @@
             text: 'Reset Progress'
             size_hint_x: 0.5
             on_press: root.reset_daily_progress()
-    
+            background_color: 255, 255, 0, 1
+            color:0,0,0,1
     BoxLayout:
         size_hint_y: None
         height: 60
@@ -173,17 +174,21 @@
             text: 'Start'
             font_size: 24
             on_press: root.start_timer()
+            background_color: 0, 250, 1, 1
+            color:0,0,0,1
         
         Button:
             text: 'Stop'
             font_size: 24
             on_press: root.stop_timer()
-        
+            background_color: 255, 0, 0, 1
+            color:0,0,0,1
         Button:
             text: 'Reset'
             font_size: 24
             on_press: root.reset_timer()
-    
+            background_color: 0, 1, 255, 1
+            color:0,0,0,1
     Button:
         text: 'Switch to ' + ('Break' if root.mode == 'WORK' else 'Work')
         size_hint_y: None
