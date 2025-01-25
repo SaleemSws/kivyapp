@@ -191,33 +191,32 @@
         font_size: 24
         on_press: root.switch_mode()
         background_color: 0.4, 0.4, 0.8, 1
-        
+
+
 <TimesUpPopup>:
-    background: 'atlas://data/images/defaulttheme/button'
-    background_color: 0.9, 0.9, 0.9, 1
-    separator_color: 0.4, 0.4, 0.8, 1
-    
+    size_hint: 0.8, 0.5
+    auto_dismiss: False
+    title: ""
     BoxLayout:
-        orientation: 'vertical'
-        padding: 20
+        orientation: "vertical"
         spacing: 10
-        
+        padding: 20
+        # Motivation label at the top
         Label:
-            text: 'Time\'s Up!'
-            font_size: 32
-            color: 0.2, 0.2, 0.8, 1
-            size_hint_y: None
-            height: 50
-        
-        Label:
-            id: mode_label
-            text: 'Session Completed'
-            font_size: 24
-            color: 0.4, 0.4, 0.4, 1
-        
+            id: motivation_label
+            text: ""
+            font_size: "50sp"
+            halign: "center"
+            valign: "middle"
+            size_hint: 1, 0.3
+        # Icon image in the center
+        Image:
+            id: icon_image
+            size_hint: 0.5, 0.5
+            pos_hint: {"center_x": 0.5}
+        # Close button at the bottom
         Button:
-            text: 'Close'
-            size_hint_y: None
-            height: 50
-            background_color: 0.4, 0.4, 0.8, 1
-            on_release: root.dismiss()
+            text: "Close"
+            size_hint: 0.5, 0.2
+            pos_hint: {"center_x": 0.5}
+            on_press: root.dismiss()
