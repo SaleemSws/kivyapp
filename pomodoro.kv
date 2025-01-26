@@ -225,6 +225,7 @@
             size_hint: 0.5, 0.2
             pos_hint: {"center_x": 0.5}
             on_press: root.dismiss()
+            
 <BreakTipPopup>:
     size_hint: 0.8, 0.5
     auto_dismiss: False
@@ -242,10 +243,12 @@
             halign: "center"
             valign: "middle"
             size_hint: 1, 0.6
-        
+
         # Close button at the bottom
         Button:
             text: "Got it!"
             size_hint: 0.5, 0.2
             pos_hint: {"center_x": 0.5}
             on_press: root.dismiss()
+            background_color: 255,255,255,1
+            color: 0,0,0,1
