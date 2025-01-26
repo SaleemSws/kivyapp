@@ -87,6 +87,19 @@ def get_random_icon(mode):
     return random.choice(ICONS[mode])
 
 
+class BreakTipPopup(Popup):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size_hint = (0.8, 0.5)
+        self.auto_dismiss = False
+
+        # Get a random break tip
+        break_tip = get_random_break_tip()
+
+        # Set properties to be used in the KV file
+        self.ids.break_tip_label.text = break_tip
+
+
 class PomodoroHistory:
     def __init__(self, filename="pomodoro_history.json"):
         self.filename = filename
@@ -372,6 +385,10 @@ class Pomodoro(BoxLayout):
             self.mode = "BREAK"
             self.time = self.break_duration * 60
 
+            # Show break tip popup
+            break_tip_popup = BreakTipPopup()
+            break_tip_popup.open()
+        else:
             self.mode = "WORK"
             self.time = self.work_duration * 60
 
