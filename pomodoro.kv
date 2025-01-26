@@ -76,13 +76,15 @@
     
 
     Label:
-        text: str(root.time // 60) + ':' + str(root.time % 60).zfill(2)
-        font_size: "96sp"  
-        bold: True  
+        id: timer_label
+        text: root.format_time(root.time)  # ใช้ฟังก์ชัน format_time จาก Python
+        font_size: "96sp"
+        bold: True
         color: (0.2, 0.8, 0.2, 1) if root.mode == 'WORK' else (0.2, 0.2, 0.8, 1)
         size_hint_y: None
         height: self.texture_size[1]
-        font_name: "fonts/digital-7.ttf" 
+        font_name: "fonts/digital-7.ttf"
+       
     BoxLayout:
         orientation: 'vertical'
         size_hint_y: None

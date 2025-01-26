@@ -498,6 +498,11 @@ class Pomodoro(BoxLayout):
             "total_break_time": total_stats["total_break_time"],
         }
 
+    def format_time(self, seconds):
+        minutes = seconds // 60
+        seconds = seconds % 60
+        return f"{minutes:02d}:{seconds:02d}"
+
 
 class PomodoroApp(App):
     def build(self):
