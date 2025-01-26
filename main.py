@@ -47,6 +47,10 @@ BREAK_TIPS = [
 ]
 
 
+def get_random_break_tip():
+    return random.choice(BREAK_TIPS)
+
+
 WORK_MOTIVATIONS = [
     "Great job staying focused!",
     "You're making progress!",
@@ -367,7 +371,7 @@ class Pomodoro(BoxLayout):
                 self.animate_progress_update(completed_time)
             self.mode = "BREAK"
             self.time = self.break_duration * 60
-        else:
+
             self.mode = "WORK"
             self.time = self.work_duration * 60
 
