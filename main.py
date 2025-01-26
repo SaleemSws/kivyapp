@@ -23,6 +23,29 @@ from kivy.uix.button import Button
 import random
 from kivy.uix.image import Image
 
+BREAK_TIPS = [
+    "Take a short walk to refresh your mind.",
+    "Do some light stretching to relax your muscles.",
+    "Hydrate yourself with a glass of water.",
+    "Practice deep breathing exercises.",
+    "Listen to calming music or a podcast.",
+    "Close your eyes and meditate for a few minutes.",
+    "Have a healthy snack to boost your energy.",
+    "Look out the window and enjoy the view.",
+    "Read a few pages of a book or an article.",
+    "Play with your pet if you have one.",
+    "Write down your thoughts or journal.",
+    "Do a quick mindfulness exercise.",
+    "Try a simple yoga pose like Child's Pose.",
+    "Listen to a short motivational podcast.",
+    "Doodle or draw something creative.",
+    "Stand up and shake out your limbs.",
+    "Massage your temples and neck gently.",
+    "Plan your next task or goal.",
+    "Smile and think of something positive.",
+    "Do a quick digital detox—stay away from screens.",
+]
+
 
 WORK_MOTIVATIONS = [
     "Great job staying focused!",
